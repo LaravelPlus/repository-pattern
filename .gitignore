@@ -1,0 +1,11 @@
+# Laravel & PHP
+/vendor/
+/node_modules/
+.env
+.phpunit.result.cache
+/storage/
+/coverage/
+/.idea/
+/.vscode/
+.DS_Store
+*.log 
