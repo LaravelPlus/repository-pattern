@@ -22,11 +22,17 @@ abstract class BaseRepository implements RepositoryInterface
 
     // Instance properties for configuration
     protected string $modelClass = '';
+
     protected string $table = '';
+
     protected string $connection = 'mysql';
+
     protected string $primaryKey = 'id';
+
     protected array $relations = [];
+
     protected array $casts = [];
+
     protected array $hidden = [];
 
     /**
@@ -108,7 +114,7 @@ abstract class BaseRepository implements RepositoryInterface
         if (empty($hidden)) {
             return $result;
         }
-        if ($result instanceof \Illuminate\Database\Eloquent\Collection) {
+        if ($result instanceof Collection) {
             $items = $result->map(function ($item) use ($hidden) {
                 foreach ($hidden as $field) {
                     if (is_array($item) && array_key_exists($field, $item)) {
@@ -117,9 +123,11 @@ abstract class BaseRepository implements RepositoryInterface
                         unset($item->$field);
                     }
                 }
+
                 return $item;
             });
-            return new \Illuminate\Database\Eloquent\Collection($items);
+
+            return new Collection($items);
         }
         if ($result instanceof \Illuminate\Support\Collection || is_array($result)) {
             return collect($result)->map(function ($item) use ($hidden) {
@@ -130,6 +138,7 @@ abstract class BaseRepository implements RepositoryInterface
                         unset($item->$field);
                     }
                 }
+
                 return $item;
             });
         }
@@ -142,6 +151,7 @@ abstract class BaseRepository implements RepositoryInterface
                 }
             }
         }
+
         return $result;
     }
 

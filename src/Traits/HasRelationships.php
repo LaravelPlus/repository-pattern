@@ -10,4 +10,4 @@ trait HasRelationships
     {
         return $this->model->with($relations)->get();
     }
-} 
+}

@@ -10,4 +10,4 @@ trait Sortable
     {
         return $this->model->orderBy($column, $direction)->get();
     }
-} 
+}

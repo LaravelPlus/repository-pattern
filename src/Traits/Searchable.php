@@ -10,4 +10,4 @@ trait Searchable
     {
         return $this->model->where($column, 'LIKE', '%' . $term . '%')->get();
     }
-} 
+}

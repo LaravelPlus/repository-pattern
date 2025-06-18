@@ -14,4 +14,4 @@ trait ValidatesData
     {
         return Validator::make($data, $this->rules)->validate();
     }
-} 
+}

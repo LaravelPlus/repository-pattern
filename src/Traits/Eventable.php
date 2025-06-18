@@ -10,4 +10,4 @@ trait Eventable
     {
         event($event, $payload);
     }
-} 
+}

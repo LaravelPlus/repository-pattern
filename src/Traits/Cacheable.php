@@ -11,6 +11,7 @@ trait Cacheable
     public function cacheAll(int $minutes = 10)
     {
         $key = static::class . '_all';
-        return Cache::remember($key, $minutes * 60, fn() => $this->all());
+
+        return Cache::remember($key, $minutes * 60, fn () => $this->all());
     }
-} 
+}

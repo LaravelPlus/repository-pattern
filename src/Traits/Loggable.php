@@ -12,4 +12,4 @@ trait Loggable
     {
         Log::info(static::class . ' action: ' . $action, $data);
     }
-} 
+}

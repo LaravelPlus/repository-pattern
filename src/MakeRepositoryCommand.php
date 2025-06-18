@@ -27,8 +27,8 @@ final class MakeRepositoryCommand extends Command
         $traitsList = '';
         if ($traits && $traits[0] !== '') {
             foreach ($traits as $trait) {
-                $traitsUse .= "use Laravelplus\\RepositoryPattern\\Traits\\$trait;\n";
-                $traitsList .= ($traitsList ? ', ' : ' ') . "$trait";
+                $traitsUse .= "use Laravelplus\\RepositoryPattern\\Traits\\{$trait};\n";
+                $traitsList .= ($traitsList ? ', ' : ' ') . "{$trait}";
             }
         }
         $interface = $this->option('interface') ? ' implements ' . $this->option('interface') : '';

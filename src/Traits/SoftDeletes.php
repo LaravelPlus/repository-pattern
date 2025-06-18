@@ -22,4 +22,4 @@ trait SoftDeletes
     {
         return $this->model->whereNotNull('deleted_at')->get();
     }
-} 
+}
