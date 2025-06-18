@@ -1,4 +1,6 @@
-# Very short description of the package
+# LaravelPlus Repository Pattern
+
+A Laravel package that helps you organize all your Eloquent queries for each model in dedicated repository classes, making your codebase more maintainable, testable, and clean. Centralize your data access logic in one spot for each model, following best practices for modern Laravel development.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/laravelplus/repository-pattern.svg?style=flat-square)](https://packagist.org/packages/laravelplus/repository-pattern)
 [![Total Downloads](https://img.shields.io/packagist/dt/laravelplus/repository-pattern.svg?style=flat-square)](https://packagist.org/packages/laravelplus/repository-pattern)
@@ -19,6 +21,62 @@ composer require laravelplus/repository-pattern
 ```php
 // Usage description here
 ```
+
+## Repository Pattern Usage
+
+The repository pattern helps you keep all your Eloquent queries for a model in one place, making your codebase more organized and easier to maintain. With this package, you can create repositories in `app/Repositories` and inject them wherever you need.
+
+### Example: `app/Repositories/UserRepository.php`
+
+```php
+namespace App\Repositories;
+
+use App\Models\User;
+
+class UserRepository
+{
+    public function all()
+    {
+        return User::all();
+    }
+
+    public function find($id)
+    {
+        return User::find($id);
+    }
+
+    public function create(array $data)
+    {
+        return User::create($data);
+    }
+
+    // Add more query methods as needed
+}
+```
+
+### Using the Repository in a Controller
+
+```php
+use App\Repositories\UserRepository;
+
+class UserController extends Controller
+{
+    protected $users;
+
+    public function __construct(UserRepository $users)
+    {
+        $this->users = $users;
+    }
+
+    public function index()
+    {
+        $users = $this->users->all();
+        return view('users.index', compact('users'));
+    }
+}
+```
+
+> **Tip:** Place all your model queries in their respective repositories under `app/Repositories` to keep your code clean and maintainable.
 
 ### Testing
 
