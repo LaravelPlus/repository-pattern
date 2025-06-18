@@ -74,4 +74,4 @@ describe('UserRepository', function (): void {
         expect($deleted)->toBeTrue();
         expect($repo->find($user->id))->toBeNull();
     });
-}); 
+});
