@@ -1,6 +1,3 @@
-includes:
-    - vendor/nunomaduro/larastan/extension.neon
-
 parameters:
     level: 8
 
@@ -25,3 +22,7 @@ parameters:
         - '#Call to an undefined method Illuminate\\[a-zA-Z\\]+#'
         - '#^Access to an undefined property App\\Models\\.*::$#'
         - '#Property App\\Models\\.* has unknown class#'
+        # Ignore unused traits as they are provided for optional use
+        - message: '#Trait .* is used zero times and is not analysed#'
+          paths:
+            - src/Traits/*
