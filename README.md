@@ -26,6 +26,22 @@ composer require laravelplus/repository-pattern
 composer test
 ```
 
+### Code Style: Pint
+
+This package uses [Laravel Pint](https://laravel.com/docs/10.x/pint) for code style fixing. To automatically fix code style issues, run:
+
+```bash
+composer pint
+```
+
+### Static Analysis: PHPStan
+
+This package uses [PHPStan](https://phpstan.org/) for static analysis. To run PHPStan, use:
+
+```bash
+composer phpstan
+```
+
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.

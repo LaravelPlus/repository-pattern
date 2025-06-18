@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ Master, master, main ]
+  pull_request:
+    branches: [ Master, master, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: [8.1, 8.2, 8.3]
+        laravel-version: [8.4.*, 12.*]
+    name: PHP ${{ matrix.php-version }} - Laravel ${{ matrix.laravel-version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, xml, ctype, json, tokenizer, bcmath
+          coverage: none
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel-version }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction --no-progress
+      - name: Run Pint (Code Style)
+        run: composer pint --test
+      - name: Run PHPStan (Static Analysis)
+        run: composer phpstan
+      - name: Run Tests
+        run: composer test 

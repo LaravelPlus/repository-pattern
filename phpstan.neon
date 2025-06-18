@@ -1,0 +1,27 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    level: 8
+
+    paths:
+        - src
+        - config
+
+    excludePaths:
+        - storage/*
+        - vendor/*
+        - node_modules/*
+        - public/*
+
+    inferPrivatePropertyTypeFromConstructor: true
+    treatPhpDocTypesAsCertain: true
+    reportUnmatchedIgnoredErrors: false
+    checkMissingTypehints: true
+    checkUninitializedProperties: true
+    checkExplicitMixed: true
+
+    ignoreErrors:
+        - '#Call to an undefined method Illuminate\\[a-zA-Z\\]+#'
+        - '#^Access to an undefined property App\\Models\\.*::$#'
+        - '#Property App\\Models\\.* has unknown class#'
