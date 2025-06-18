@@ -11,13 +11,11 @@ use Laravelplus\RepositoryPattern\Contracts\RepositoryInterface;
 
 /**
  * @template TModel of Model
+ *
  * @implements RepositoryInterface<TModel>
  */
 abstract class BaseRepository implements RepositoryInterface
 {
-    /**
-     * @var Model
-     */
     protected Model $model;
 
     public function __construct(Model $model)
@@ -32,6 +30,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         /** @var Collection<int, TModel> $result */
         $result = $this->model->newQuery()->orderByDesc('id')->get();
+
         return $result;
     }
 
@@ -47,6 +46,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         /** @var TModel|null $result */
         $result = $this->model->newQuery()->find($id);
+
         return $result;
     }
 
@@ -57,6 +57,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         /** @var TModel|null $result */
         $result = $this->model->newQuery()->where($field, $value)->first();
+
         return $result;
     }
 
@@ -67,6 +68,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         /** @var TModel $result */
         $result = $this->model->newQuery()->create($data);
+
         return $result;
     }
 

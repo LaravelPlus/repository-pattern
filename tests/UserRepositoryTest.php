@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Prefabs\UserRepository;
-use Illuminate\Database\Eloquent\Model;
 
-describe('UserRepository', function () {
-    beforeEach(function () {
+describe('UserRepository', function (): void {
+    beforeEach(function (): void {
         // Setup Eloquent with in-memory SQLite
         $capsule = new Capsule();
         $capsule->addConnection([
@@ -18,7 +20,7 @@ describe('UserRepository', function () {
         $capsule->bootEloquent();
 
         // Create users table
-        Capsule::schema()->create('users', function (Blueprint $table) {
+        Capsule::schema()->create('users', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -27,7 +29,7 @@ describe('UserRepository', function () {
         });
     });
 
-    it('can create, find, update, delete, and search users', function () {
+    it('can create, find, update, delete, and search users', function (): void {
         // Define a simple User model
         eval('class TestUser extends \\Illuminate\\Database\\Eloquent\\Model { protected $table = "users"; protected $fillable = ["name", "email", "password"]; public $timestamps = true; }');
         $userModel = new TestUser();
@@ -72,4 +74,4 @@ describe('UserRepository', function () {
         expect($deleted)->toBeTrue();
         expect($repo->find($user->id))->toBeNull();
     });
-}); 
+});
