@@ -4,222 +4,87 @@ declare(strict_types=1);
 
 namespace Laravelplus\RepositoryPattern;
 
-use BadMethodCallException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 use Laravelplus\RepositoryPattern\Contracts\RepositoryInterface;
 
+/**
+ * @template TModel of Model
+ * @implements RepositoryInterface<TModel>
+ */
 abstract class BaseRepository implements RepositoryInterface
 {
     /**
-     * The model instance.
-     *
      * @var Model
      */
-    protected $model;
+    protected Model $model;
 
-    // Instance properties for configuration
-    protected string $modelClass = '';
-
-    protected string $table = '';
-
-    protected string $connection = 'mysql';
-
-    protected string $primaryKey = 'id';
-
-    protected array $relations = [];
-
-    protected array $casts = [];
-
-    protected array $hidden = [];
-
-    /**
-     * BaseRepository constructor.
-     */
-    public function __construct(?Model $model = null)
+    public function __construct(Model $model)
     {
-        $modelClass = $this->modelClass ?: Model::class;
-        $this->model = $model ?? new $modelClass();
-        $this->table = $this->table ?: $this->model->getTable();
-        $defaultConnection = config('database.default');
-        $conn = $this->connection ?: $this->model->getConnectionName();
-        $this->connection = ($conn && $conn !== $defaultConnection) ? $conn : null;
-    }
-
-    protected function getQuery()
-    {
-        if ($this->connection) {
-            return DB::connection($this->connection)->table($this->table);
-        }
-
-        return DB::table($this->table);
-    }
-
-    public function __get($name)
-    {
-        if ($name === 'table') {
-            return $this->getQuery();
-        }
-        if ($name === 'model') {
-            return $this->model;
-        }
-        if ($name === 'relations') {
-            return $this->relations;
-        }
-        if ($name === 'casts') {
-            return $this->casts;
-        }
-
-        return $this->$name;
-    }
-
-    public function __call($method, $arguments)
-    {
-        if (isset($this->relations[$method])) {
-            $relation = $this->relations[$method];
-            $defaultConnection = config('database.default');
-            if (is_string($relation) && class_exists($relation)) {
-                return new $relation();
-            }
-            if (is_string($relation)) {
-                $connection = $this->connection;
-                if (!$connection || $connection === $defaultConnection) {
-                    return DB::table($relation);
-                }
-
-                return DB::connection($connection)->table($relation);
-            }
-            if (is_array($relation) && isset($relation['table'])) {
-                $connection = $relation['connection'] ?? $this->connection;
-                $primaryKey = $relation['primaryKey'] ?? 'id';
-                $foreignKey = $relation['foreignKey'] ?? null;
-                $query = (!$connection || $connection === $defaultConnection)
-                    ? DB::table($relation['table'])
-                    : DB::connection($connection)->table($relation['table']);
-                if ($foreignKey && isset($arguments[0])) {
-                    $query->where($foreignKey, $arguments[0]);
-                }
-
-                return $query;
-            }
-        }
-        throw new BadMethodCallException("Relation or method '{$method}' not defined in " . static::class);
-    }
-
-    protected function hideFields($result)
-    {
-        $hidden = $this->hidden;
-        if (empty($hidden)) {
-            return $result;
-        }
-        if ($result instanceof Collection) {
-            $items = $result->map(function ($item) use ($hidden) {
-                foreach ($hidden as $field) {
-                    if (is_array($item) && array_key_exists($field, $item)) {
-                        unset($item[$field]);
-                    } elseif (is_object($item) && property_exists($item, $field)) {
-                        unset($item->$field);
-                    }
-                }
-
-                return $item;
-            });
-
-            return new Collection($items);
-        }
-        if ($result instanceof \Illuminate\Support\Collection || is_array($result)) {
-            return collect($result)->map(function ($item) use ($hidden) {
-                foreach ($hidden as $field) {
-                    if (is_array($item) && array_key_exists($field, $item)) {
-                        unset($item[$field]);
-                    } elseif (is_object($item) && property_exists($item, $field)) {
-                        unset($item->$field);
-                    }
-                }
-
-                return $item;
-            });
-        }
-        if (is_object($result) || is_array($result)) {
-            foreach ($hidden as $field) {
-                if (is_array($result) && array_key_exists($field, $result)) {
-                    unset($result[$field]);
-                } elseif (is_object($result) && property_exists($result, $field)) {
-                    unset($result->$field);
-                }
-            }
-        }
-
-        return $result;
+        $this->model = $model;
     }
 
     /**
-     * Get all records.
+     * @return Collection<int, TModel>
      */
     public function all(): Collection
     {
-        $results = $this->model->all();
-
-        return $this->hideFields($results);
-    }
-
-    /**
-     * Find a record by ID.
-     */
-    public function find(int|string $id): ?Model
-    {
-        $result = $this->model->where($this->primaryKey, $id)->first();
-
-        return $this->hideFields($result);
-    }
-
-    /**
-     * Create a new record.
-     */
-    public function create(array $data): Model
-    {
-        return $this->model->create($data);
-    }
-
-    /**
-     * Update a record by ID.
-     */
-    public function update(int|string $id, array $data): ?Model
-    {
-        $model = $this->find($id);
-        if ($model) {
-            $model->update($data);
-
-            return $model;
-        }
-
-        return null;
-    }
-
-    /**
-     * Delete a record by ID.
-     */
-    public function delete(int|string $id): bool
-    {
-        return (bool) $this->model->where($this->primaryKey, $id)->delete();
+        /** @var Collection<int, TModel> $result */
+        $result = $this->model->newQuery()->orderByDesc('id')->get();
+        return $result;
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->paginate($perPage);
+        return $this->model->newQuery()->orderByDesc('id')->paginate($perPage);
     }
 
+    /**
+     * @return TModel|null
+     */
+    public function find(int|string $id): ?Model
+    {
+        /** @var TModel|null $result */
+        $result = $this->model->newQuery()->find($id);
+        return $result;
+    }
+
+    /**
+     * @return TModel|null
+     */
     public function findBy(string $field, mixed $value): ?Model
     {
-        return $this->model->where($field, $value)->first();
+        /** @var TModel|null $result */
+        $result = $this->model->newQuery()->where($field, $value)->first();
+        return $result;
     }
 
-    // Utility methods are now available via RepositoryService:
-    // - RepositoryService::map($results, fn($item) => ...)
-    // - RepositoryService::mapWithKeys($results, fn($item) => ...)
-    // - RepositoryService::modifyFields($results, ['field' => fn($v, $item) => ...])
-    // - RepositoryService::runOnConnection('mysql2', fn($db) => ...)
-    // - RepositoryService::crossConnectionQuery(...)
+    /**
+     * @return TModel
+     */
+    public function create(array $data): Model
+    {
+        /** @var TModel $result */
+        $result = $this->model->newQuery()->create($data);
+        return $result;
+    }
+
+    public function update(int|string $id, array $data): ?Model
+    {
+        $record = $this->find($id);
+        if (!$record) {
+            return null;
+        }
+        $record->update($data);
+
+        return $record;
+    }
+
+    public function delete(int|string $id): bool
+    {
+        $record = $this->find($id);
+
+        return $record ? (bool) $record->delete() : false;
+    }
 }

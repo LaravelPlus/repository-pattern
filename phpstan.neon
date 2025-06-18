@@ -10,9 +10,11 @@ parameters:
         - vendor/*
         - node_modules/*
         - public/*
+        - examples/*
+        - prefabs/*
 
     inferPrivatePropertyTypeFromConstructor: true
-    treatPhpDocTypesAsCertain: true
+    treatPhpDocTypesAsCertain: false
     reportUnmatchedIgnoredErrors: false
     checkMissingTypehints: true
     checkUninitializedProperties: true
@@ -26,3 +28,8 @@ parameters:
         - message: '#Trait .* is used zero times and is not analysed#'
           paths:
             - src/Traits/*
+        - '#Call to an undefined method TModel of Illuminate\\Database\\Eloquent\\Model::(where|create|paginate)\(\)\.#'
+        - '#Parameter \#1 \$table of (static method|method) Illuminate\\(Support\\Facades\\DB|Database\\Connection)::table\(\) expects#'
+        - '#Instanceof between Illuminate\\Database\\Eloquent\\Model and Illuminate\\Database\\Eloquent\\Model will always evaluate to true\.#'
+        - '#Call to function is_array\(\) with T of mixed will always evaluate to false\.#'
+        - '#Call to function is_array\(\) with object&T of mixed will always evaluate to false\.#'

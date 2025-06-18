@@ -23,6 +23,7 @@
     "require-dev": {
         "laravel/framework": "^12.0",
         "laravel/pint": "^1.22",
+        "nunomaduro/larastan": "^3.4",
         "orchestra/testbench": "^10.0",
         "pestphp/pest": "*",
         "pestphp/pest-plugin-laravel": "^3.2",
@@ -31,7 +32,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Laravelplus\\RepositoryPattern\\": "src"
+            "Laravelplus\\RepositoryPattern\\": "src/",
+            "Prefabs\\": "prefabs/"
         }
     },
     "autoload-dev": {

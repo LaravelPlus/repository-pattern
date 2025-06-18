@@ -44,9 +44,9 @@ final class RepositoryPatternServiceProvider extends ServiceProvider
             ], 'lang');*/
 
             // Registering package commands.
-            $this->commands([
-                MakeRepositoryCommand::class,
-            ]);
+            // $this->commands([
+            //     MakeRepositoryCommand::class,
+            // ]);
         }
     }
 
