@@ -1,0 +1,54 @@
+{
+    "name": "laravelplus/repository-pattern",
+    "description": "Laravel repository-pattern ",
+    "keywords": [
+        "laravelplus",
+        "repository-pattern"
+    ],
+    "homepage": "https://github.com/laravelplus/repository-pattern",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Nejc Cotic",
+            "email": "info@after.si",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "illuminate/support": "^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laravelplus\\RepositoryPattern\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Laravelplus\\RepositoryPattern\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Laravelplus\\RepositoryPattern\\RepositoryPatternServiceProvider"
+            ],
+            "aliases": {
+                "RepositoryPattern": "Laravelplus\\RepositoryPattern\\RepositoryPatternFacade"
+            }
+        }
+    }
+}
