@@ -40,9 +40,16 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit",
-        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-
+        "test": "pest",
+        "test-coverage": "pest --coverage",
+        "analyse": "phpstan analyse",
+        "pint": "pint",
+        "pint-test": "pint --test",
+        "check": [
+            "@pint-test",
+            "@analyse",
+            "@test"
+        ]
     },
     "config": {
         "sort-packages": true,
