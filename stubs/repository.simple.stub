@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ modelNamespace }};
+use Laravelplus\RepositoryPattern\BaseRepository;
+
+final class {{ class }} extends BaseRepository
+{
+    protected static string $modelClass = {{ model }}::class;
+    // Optionally configure $table, $primaryKey, $connection, etc.
+} 

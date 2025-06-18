@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Laravelplus\RepositoryPattern;
 
 use Illuminate\Support\ServiceProvider;
 
-class RepositoryPatternServiceProvider extends ServiceProvider
+final class RepositoryPatternServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
      */
-    public function boot()
+    public function boot(): void
     {
         /*
          * Optional methods to load your package assets
@@ -22,6 +24,8 @@ class RepositoryPatternServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/config.php' => config_path('repository-pattern.php'),
+                __DIR__.'/../stubs/repository.stub' => base_path('stubs/repository.stub'),
+                __DIR__.'/../stubs/repository.simple.stub' => base_path('stubs/repository.simple.stub'),
             ], 'config');
 
             // Publishing the views.
@@ -40,21 +44,21 @@ class RepositoryPatternServiceProvider extends ServiceProvider
             ], 'lang');*/
 
             // Registering package commands.
-            // $this->commands([]);
+            $this->commands([
+                MakeRepositoryCommand::class,
+            ]);
         }
     }
 
     /**
      * Register the application services.
      */
-    public function register()
+    public function register(): void
     {
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'repository-pattern');
 
         // Register the main class to use with the facade
-        $this->app->singleton('repository-pattern', function () {
-            return new RepositoryPattern;
-        });
+        $this->app->singleton('repository-pattern', fn () => new RepositoryPattern());
     }
 }

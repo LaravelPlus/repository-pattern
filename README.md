@@ -124,3 +124,85 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 ## Laravel Package Boilerplate
 
 This package was generated using the [Laravel Package Boilerplate](https://laravelpackageboilerplate.com).
+
+## Modern Repository Example with Traits
+
+You can enhance your repositories by mixing in traits for extra features like soft deletes, caching, and multi-database support.
+
+### Example: `app/Repositories/UserRepository.php`
+
+```php
+namespace App\Repositories;
+
+use App\Models\User;
+use Laravelplus\RepositoryPattern\BaseRepository;
+use Laravelplus\RepositoryPattern\Traits\SoftDeletes;
+use Laravelplus\RepositoryPattern\Traits\Cacheable;
+use Laravelplus\RepositoryPattern\Traits\MultiDatabase;
+
+class UserRepository extends BaseRepository implements \Laravelplus\RepositoryPattern\Contracts\MultiDatabaseInterface
+{
+    use SoftDeletes, Cacheable, MultiDatabase;
+
+    protected static string $modelClass = User::class;
+    // Optionally configure $table, $primaryKey, $connection, etc.
+}
+```
+
+### Using Trait Methods
+
+```php
+$userRepo = new UserRepository();
+$userRepo->softDelete($userId); // Soft delete a user
+$userRepo->restore($userId);    // Restore a soft-deleted user
+$userRepo->cacheAll(30);        // Cache all users for 30 minutes
+$userRepo->runOnConnection('mysql2', fn($db) => $db->table('users')->get());
+```
+
+## Available Traits
+
+- `SoftDeletes`: Adds soft delete, restore, and onlyTrashed methods.
+- `Cacheable`: Adds cacheAll for caching results.
+- `Loggable`: Adds logAction for logging repository actions.
+- `Eventable`: Adds fireEvent for dispatching events.
+- `ValidatesData`: Adds validate for validating data before create/update.
+- `Searchable`: Adds search for column-based LIKE search.
+- `Sortable`: Adds sortBy for sorting results.
+- `HasRelationships`: Adds withRelations for eager loading relationships.
+- `MultiDatabase`: Adds runOnConnection and crossConnectionQuery for multi-database support.
+
+Mix and match these traits in your repositories as needed!
+
+## Repository Generator Command
+
+You can quickly generate repository classes using the built-in Artisan command:
+
+### Simple Repository
+
+Generate a basic repository (no traits or interface):
+
+```bash
+php artisan make:repository User
+```
+
+This uses the `stubs/repository.simple.stub` template.
+
+### Repository with Traits and Interface
+
+Generate a repository with traits and/or an interface:
+
+```bash
+php artisan make:repository User --traits=SoftDeletes,Cacheable --interface=MultiDatabaseInterface
+```
+
+This uses the `stubs/repository.stub` template and will insert the specified traits and interface.
+
+### Customizing Stubs
+
+You can publish the stubs to your application and customize them as needed:
+
+```bash
+php artisan vendor:publish --tag=config
+```
+
+This will copy the stubs to your `stubs/` directory, where you can edit them to fit your project's needs.
