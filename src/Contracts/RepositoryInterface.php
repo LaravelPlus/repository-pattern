@@ -23,18 +23,4 @@ interface RepositoryInterface
     public function update(int|string $id, array $data): ?Model;
 
     public function delete(int|string $id): bool;
-
-    public function map($results, callable $callback);
-
-    public function mapWithKeys($results, callable $callback);
-
-    public function modifyFields($results, array $modifiers);
-
-    public function runOnConnection(string $connection, callable $callback);
-
-    public function crossConnectionQuery(
-        string $connA, string $tableA,
-        string $connB, string $tableB,
-        string $keyA, string $keyB
-    );
 }

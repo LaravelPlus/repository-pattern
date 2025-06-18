@@ -20,31 +20,25 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected $model;
 
-    // Static properties for configuration
-    protected static string $modelClass = '';
-
-    protected static string $table = '';
-
-    protected static string $connection = 'mysql';
-
-    protected static string $primaryKey = 'id';
-
-    protected static array $relations = [];
-
-    protected static array $casts = [];
-
-    protected static array $hidden = [];
+    // Instance properties for configuration
+    protected string $modelClass = '';
+    protected string $table = '';
+    protected string $connection = 'mysql';
+    protected string $primaryKey = 'id';
+    protected array $relations = [];
+    protected array $casts = [];
+    protected array $hidden = [];
 
     /**
      * BaseRepository constructor.
      */
     public function __construct(?Model $model = null)
     {
-        $modelClass = static::$modelClass ?: Model::class;
+        $modelClass = $this->modelClass ?: Model::class;
         $this->model = $model ?? new $modelClass();
-        $this->table = static::$table ?: $this->model->getTable();
+        $this->table = $this->table ?: $this->model->getTable();
         $defaultConnection = config('database.default');
-        $conn = static::$connection ?: $this->model->getConnectionName();
+        $conn = $this->connection ?: $this->model->getConnectionName();
         $this->connection = ($conn && $conn !== $defaultConnection) ? $conn : null;
     }
 
@@ -66,10 +60,10 @@ abstract class BaseRepository implements RepositoryInterface
             return $this->model;
         }
         if ($name === 'relations') {
-            return static::$relations;
+            return $this->relations;
         }
         if ($name === 'casts') {
-            return static::$casts;
+            return $this->casts;
         }
 
         return $this->$name;
@@ -77,14 +71,14 @@ abstract class BaseRepository implements RepositoryInterface
 
     public function __call($method, $arguments)
     {
-        if (isset(static::$relations[$method])) {
-            $relation = static::$relations[$method];
+        if (isset($this->relations[$method])) {
+            $relation = $this->relations[$method];
             $defaultConnection = config('database.default');
             if (is_string($relation) && class_exists($relation)) {
                 return new $relation();
             }
             if (is_string($relation)) {
-                $connection = static::$connection;
+                $connection = $this->connection;
                 if (!$connection || $connection === $defaultConnection) {
                     return DB::table($relation);
                 }
@@ -92,7 +86,7 @@ abstract class BaseRepository implements RepositoryInterface
                 return DB::connection($connection)->table($relation);
             }
             if (is_array($relation) && isset($relation['table'])) {
-                $connection = $relation['connection'] ?? static::$connection;
+                $connection = $relation['connection'] ?? $this->connection;
                 $primaryKey = $relation['primaryKey'] ?? 'id';
                 $foreignKey = $relation['foreignKey'] ?? null;
                 $query = (!$connection || $connection === $defaultConnection)
@@ -110,9 +104,22 @@ abstract class BaseRepository implements RepositoryInterface
 
     protected function hideFields($result)
     {
-        $hidden = static::$hidden;
+        $hidden = $this->hidden;
         if (empty($hidden)) {
             return $result;
+        }
+        if ($result instanceof \Illuminate\Database\Eloquent\Collection) {
+            $items = $result->map(function ($item) use ($hidden) {
+                foreach ($hidden as $field) {
+                    if (is_array($item) && array_key_exists($field, $item)) {
+                        unset($item[$field]);
+                    } elseif (is_object($item) && property_exists($item, $field)) {
+                        unset($item->$field);
+                    }
+                }
+                return $item;
+            });
+            return new \Illuminate\Database\Eloquent\Collection($items);
         }
         if ($result instanceof \Illuminate\Support\Collection || is_array($result)) {
             return collect($result)->map(function ($item) use ($hidden) {
@@ -123,7 +130,6 @@ abstract class BaseRepository implements RepositoryInterface
                         unset($item->$field);
                     }
                 }
-
                 return $item;
             });
         }
@@ -136,7 +142,6 @@ abstract class BaseRepository implements RepositoryInterface
                 }
             }
         }
-
         return $result;
     }
 
@@ -155,7 +160,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find(int|string $id): ?Model
     {
-        $result = $this->model->where(static::$primaryKey, $id)->first();
+        $result = $this->model->where($this->primaryKey, $id)->first();
 
         return $this->hideFields($result);
     }
@@ -188,7 +193,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function delete(int|string $id): bool
     {
-        return (bool) $this->model->where(static::$primaryKey, $id)->delete();
+        return (bool) $this->model->where($this->primaryKey, $id)->delete();
     }
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
